@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Convert text to lifelike speech using ElevenLabs AI Voice API. Clean, modern, and beginner-friendly web application.">
+  <title>ElevenLabs Text-to-Speech Studio</title>
+  <!-- Google Fonts: Inter and Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient background glow elements -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+
+  <main class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="badge">
+        <span class="badge-dot"></span>
+        <span>ElevenLabs Voice AI</span>
+      </div>
+      <h1 class="app-title">Text to Speech Studio</h1>
+      <p class="app-subtitle">Transform your written text into human-like speech with AI</p>
+    </header>
+
+    <!-- Main Card -->
+    <div class="studio-card">
+      
+      <!-- API Key & Environment Status Section -->
+      <section class="config-row">
+        <div class="input-group full-width">
+          <div class="label-row">
+            <label for="apiKeyInput">ElevenLabs API Key</label>
+            <span class="hint-text" id="apiKeyStatusHint">🔒 Securely managed via <code>.env</code> file (or enter override)</span>
+          </div>
+          <div class="api-key-wrapper">
+            <input 
+              type="password" 
+              id="apiKeyInput" 
+              placeholder="Leave blank to use .env key, or paste custom key..."
+              autocomplete="off"
+            >
+            <button type="button" id="toggleApiKeyVisibility" class="icon-btn" title="Toggle visibility">
+              <svg id="eyeIcon" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12s3-7 10-7 7 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Voice and Model Selection -->
+      <section class="selectors-grid">
+        <!-- Voice Dropdown -->
+        <div class="input-group">
+          <label for="voiceSelect">Select Voice</label>
+          <div class="select-wrapper">
+            <select id="voiceSelect">
+              <option value="21m00Tcm4TlvDq8ikWAM" selected>Rachel (Calm & Natural - Female)</option>
+              <option value="pNInz6obpgDQGcFmaJgB">Adam (Deep & Narrator - Male)</option>
+              <option value="ErXwobaYiN019PkySvjV">Antoni (Well-rounded - Male)</option>
+              <option value="EXAVITQu4vr4xnSDxMaL">Bella (Soft & Expressive - Female)</option>
+              <option value="AZnzlk1XvdvUeBnXmlld">Domi (Energetic & Confident - Female)</option>
+              <option value="MF3mGyEYCl7XYWbV9V6O">Elli (Gentle & Youthful - Female)</option>
+              <option value="TxGEqnHWrfWFTfGW9XjX">Josh (Warm & Casual - Male)</option>
+              <option value="piTKgcLEGmPE4e6mEKli">Nicole (Smooth Audiobook - Female)</option>
+            </select>
+            <span class="select-arrow">▼</span>
+          </div>
+        </div>
+
+        <!-- Model Dropdown -->
+        <div class="input-group">
+          <label for="modelSelect">Select AI Model</label>
+          <div class="select-wrapper">
+            <select id="modelSelect">
+              <option value="eleven_multilingual_v2" selected>Eleven Multilingual v2 (High Quality)</option>
+              <option value="eleven_turbo_v2_5">Eleven Turbo v2.5 (Fast & Low Latency)</option>
+              <option value="eleven_flash_v2_5">Eleven Flash v2.5 (Ultra Fast)</option>
+              <option value="eleven_monolingual_v1">Eleven English v1 (Standard)</option>
+            </select>
+            <span class="select-arrow">▼</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Textarea Input Area -->
+      <section class="input-group">
+        <div class="label-row">
+          <label for="textInput">Your Text</label>
+          <div class="quick-samples">
+            <span class="sample-label">Try sample:</span>
+            <button type="button" class="chip-btn" data-sample="welcome">Welcome</button>
+            <button type="button" class="chip-btn" data-sample="story">Story</button>
+            <button type="button" class="chip-btn" data-sample="quote">Quote</button>
+          </div>
+        </div>
+
+        <div class="textarea-container">
+          <textarea 
+            id="textInput" 
+            placeholder="Type or paste the text you want the AI to read aloud..." 
+            rows="6"
+            maxlength="2500"
+          >Welcome to the ElevenLabs Text to Speech Studio! Type any text you want, select your favorite voice, and hit Play to hear high-quality AI speech.</textarea>
+          <div class="textarea-footer">
+            <button type="button" id="clearBtn" class="text-btn">Clear Text</button>
+            <span id="charCount" class="char-count">0 / 2500</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Voice Stability & Clarity Settings (Optional accordion / tuning) -->
+      <details class="tuning-details">
+        <summary>Voice Fine-Tuning (Optional)</summary>
+        <div class="tuning-grid">
+          <div class="slider-group">
+            <div class="slider-header">
+              <label for="stabilitySlider">Stability: <span id="stabilityVal">0.50</span></label>
+            </div>
+            <input type="range" id="stabilitySlider" min="0" max="1" step="0.05" value="0.50">
+            <div class="slider-labels">
+              <span>More variable</span>
+              <span>More stable</span>
+            </div>
+          </div>
+          <div class="slider-group">
+            <div class="slider-header">
+              <label for="claritySlider">Clarity / Similarity: <span id="clarityVal">0.75</span></label>
+            </div>
+            <input type="range" id="claritySlider" min="0" max="1" step="0.05" value="0.75">
+            <div class="slider-labels">
+              <span>Low</span>
+              <span>High</span>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- Status Notification Message -->
+      <div id="statusMessage" class="status-banner" style="display: none;">
+        <span id="statusIcon" class="status-icon">ℹ️</span>
+        <span id="statusText">Ready</span>
+      </div>
+
+      <!-- Action Area -->
+      <div class="actions-wrapper">
+        <button id="playBtn" class="primary-btn" type="button">
+          <!-- Play Icon -->
+          <svg id="playIcon" class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <!-- Spinner Icon (hidden by default) -->
+          <svg id="loadingSpinner" class="spinner hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
+            <path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"></path>
+          </svg>
+          <span id="playBtnText">Generate & Play</span>
+        </button>
+
+        <!-- Audio Player & Controls (Shown once generated) -->
+        <div id="audioPlayerContainer" class="audio-player-container hidden">
+          <div class="audio-header">
+            <div class="wave-visualizer">
+              <span class="bar"></span>
+              <span class="bar"></span>
+              <span class="bar"></span>
+              <span class="bar"></span>
+              <span class="bar"></span>
+            </div>
+            <span class="audio-label">Generated Speech</span>
+            <a id="downloadAudioBtn" class="download-link" href="#" download="elevenlabs_speech.mp3" title="Download Audio">
+              <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Download
+            </a>
+          </div>
+          <audio id="audioElement" controls class="native-audio"></audio>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>Built with Vanilla HTML, CSS & JavaScript • Ready for Live Server testing</p>
+    </footer>
+  </main>
+
+  <!-- Main JavaScript File -->
+  <script src="script.js"></script>
+</body>
+</html>
